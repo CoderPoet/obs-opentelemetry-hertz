@@ -82,8 +82,11 @@ func ClientMiddleware(opts ...Option) client.Middleware {
 			if httpReq, err := adaptor.GetCompatRequest(req); err == nil {
 				span.SetAttributes(semconv.NetAttributesFromHTTPRequest("tcp", httpReq)...)
 				span.SetAttributes(semconv.EndUserAttributesFromHTTPRequest(httpReq)...)
-				span.SetAttributes(semconv.HTTPServerAttributesFromHTTPRequest("", string(req.RequestURI()), httpReq)...)
+				span.SetAttributes(semconv.HTTPClientAttributesFromHTTPRequest(httpReq)...)
 			}
+
+			span.SetAttributes(semconv.HTTPAttributesFromHTTPStatusCode(resp.StatusCode())...)
+			span.SetStatus(semconv.SpanStatusFromHTTPStatusCode(resp.StatusCode()))
 
 			metricsAttributes := extractMetricsAttributesFromSpan(span)
 
